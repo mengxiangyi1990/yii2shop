@@ -16,7 +16,7 @@ use Yii;
  */
 class Brand extends \yii\db\ActiveRecord
 {
-    public $file; //用来保存上传文件
+   // public $file; //用来保存上传文件
 
 
 
@@ -35,7 +35,7 @@ class Brand extends \yii\db\ActiveRecord
     {
         return [
             [['name','sort','intro','status'],'required'],
-            ['file','file', 'extensions' => ['png', 'jpg', 'gif'], 'maxSize' => 1024*1024*1024],
+            [['logo'], 'string', 'max' => 255],
         ];
     }
 
