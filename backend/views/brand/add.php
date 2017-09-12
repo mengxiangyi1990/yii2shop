@@ -7,8 +7,7 @@ echo $form->field($model,'sort')->textInput();
 echo $form->field($model,'status',['inline'=>true])->radioList(['隐藏','正常']);
 
 echo $form->field($model,'logo')->hiddenInput();
-echo \yii\helpers\Html::img($model->logo,['class'=>'img-rounded','style'=>'width:200px;height:150px','id'=>'img']);
-
+echo \yii\helpers\Html::img($model->logo,['class'=>'img-rounded','style'=>'width:200px;height:150px;','id'=>'img']);
 //===========uploadifive插件========
 
 //外部TAG

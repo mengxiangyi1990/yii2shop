@@ -61,12 +61,16 @@ class ArticleCategoryController extends \yii\web\Controller
 
 
     //删除一个分类
-    public function actionDel($id){
+    public function actionDel(){
+        $id = \Yii::$app->request->post('id');
         $model = ArticleCategory::find()->where(['id'=>$id])->one();
-
-        $model->status = -1;
-        $model->save();
-        return $this->redirect(['article-category/index']);
+        if($model){
+            $model->status = -1;
+            $model->save();
+            return 'success';
+        }
+        //跳转到列表页
+        return 'fail';
     }
 
 }

@@ -4,7 +4,7 @@ echo \yii\helpers\Html::a('添加类别',['brand/add'],['class'=>'btn btn-primar
 
 ?>
 
-<table class="table table-bordered text-center">
+<table class="table text-center">
     <tr>
         <td>ID</td>
         <td>名称</td>
