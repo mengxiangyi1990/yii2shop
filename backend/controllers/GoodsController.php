@@ -11,6 +11,7 @@ use backend\models\GoodsInfo;
 use flyok666\uploadifive\UploadAction;
 use flyok666\qiniu\Qiniu;
 use yii\data\Pagination;
+use yii\db\Query;
 
 
 class GoodsController extends \yii\web\Controller
@@ -20,14 +21,58 @@ class GoodsController extends \yii\web\Controller
         /**
          * 准备分页数据
          */
-        $totalCount = Goods::find()->where(['>','status','-1'])->count();  //查询brand表中数据总条数
+
+//        $name = isset($_GET['name'])?$_GET['name']:'';
+//        $sn = isset($_GET['sn'])?$_GET['sn']:'';
+//        $minPrice = isset($_GET['minPrice'])?$_GET['minPrice']:"";
+//        $maxPrice = isset($_GET['maxPrice'])?$_GET['maxPrice']:"";
+
+//        $totalCount = Goods::find()->filterWhere(
+//            ['like','name',$name]
+//        )->orFilterWhere(
+//            ['like','sn',$sn]
+//        )->andFilterWhere(
+//            ['between','shop_price',$minPrice,$maxPrice]
+//        )->count();  //查询brand表中数据总条数
+//        $pageTool = new Pagination([
+//            'totalCount'=>$totalCount,
+//            'defaultPageSize'=>4
+//        ]); //实例化一个分页组件对象
+//
+//        $model = Goods::find()->filterWhere(
+//            ['like','name',$name]
+//            )->orFilterWhere(
+//                ['like','sn',$sn]
+//        )->andFilterWhere(
+//            ['between','shop_price',$minPrice,$maxPrice]
+//        )->limit($pageTool->limit)->offset($pageTool->offset)->orderBy('id desc')->all();
+        $name = \Yii::$app->request->get('name');
+        $sn = \Yii::$app->request->get('sn');
+        $minPrice = \Yii::$app->request->get('minPrice');
+        $maxPrice = \Yii::$app->request->get('maxPrice');
+        $query = Goods::find();
+        if(!empty($name)){
+            $query = $query->where(['like','name',$name]);
+        }
+        if(!empty($sn)){
+            $query = $query->andwhere(['like','sn',$sn]);
+        }
+        if(!empty($minPrice)){
+            $query = $query->andWhere(['>=','shop_price',$minPrice]);
+        }
+        if(!empty($maxPrice)){
+            $query = $query->andWhere(['<=','shop_price',$maxPrice]);
+        }
+        $totalCount = $query->count();  //查询brand表中数据总条数
+//        echo $totalCount;exit;
         $pageTool = new Pagination([
             'totalCount'=>$totalCount,
             'defaultPageSize'=>4
         ]); //实例化一个分页组件对象
 
-        $model = Goods::find()->limit($pageTool->limit)->offset($pageTool->offset)->orderBy('id desc')->all();
-        return $this->render('index',['models'=>$model,'pageTool'=>$pageTool]);
+        $model = $query->limit($pageTool->limit)->offset($pageTool->offset)->orderBy('id desc')->all();
+
+        return $this->render('index',['models'=>$model,'pageTool'=>$pageTool,'name'=>$name,'sn'=>$sn,'minPrice'=>$minPrice,'maxPrice'=>$maxPrice]);
     }
     //商品添加
     public function actionAdd(){

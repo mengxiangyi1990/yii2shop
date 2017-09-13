@@ -3,6 +3,36 @@
 echo \yii\helpers\Html::a('添加商品',['goods/add'],['class'=>'btn btn-info']);
 
 ?>
+<!--  搜索框 -->
+
+<form id="w0" class="form-inline" action="<?=\yii\helpers\Url::to(['goods/index'])?>" method="get" role="form"><div class="form-group field-goodssearchform-name has-success">
+
+        <input type="text" id="goodssearchform-name" class="form-control" name="name" placeholder="商品名" aria-invalid="false" value="<?=$name?>">
+
+    </div><div class="form-group field-goodssearchform-sn has-success">
+
+        <input type="text" id="goodssearchform-sn" class="form-control" name="sn" placeholder="货号" aria-invalid="false" value="<?=$sn?>">
+
+    </div><div class="form-group field-goodssearchform-minprice has-success">
+
+        <input type="text" id="goodssearchform-minprice" class="form-control" name="minPrice" placeholder="￥" aria-invalid="false" value="<?=$minPrice?>">
+
+    </div><div class="form-group field-goodssearchform-maxprice has-success">
+        <label class="sr-only" for="goodssearchform-maxprice">-</label>
+        <input type="text" id="goodssearchform-maxprice" class="form-control" name="maxPrice" placeholder="￥" aria-invalid="false" value="<?=$maxPrice?>">
+    </div>
+    <button type="submit" class="btn btn-default btn-search"><span class="glyphicon glyphicon-search"></span>搜索</button>
+    <button type="button" class="btn btn-info btn-reverse"><span class="glyphicon glyphicon-time"></span>重置</button>
+</form>
+
+
+
+
+
+
+
+<!-- 搜索框-->
+
 <table class="table table-bordered text-center">
     <tr>
         <td>ID</td>
@@ -63,6 +93,12 @@ $this->registerJs(new \yii\web\JsExpression(
            });
        }
     })
+    
+    $('.btn-reverse').click(function(){
+        $('input').val('');
+        $('.btn-search').click();
+    });
+    
 JS
 ));
 

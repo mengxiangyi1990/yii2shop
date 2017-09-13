@@ -47,7 +47,7 @@ EOF
 ]);
 //===========uploadifive========
 
-echo $form->field($model,'goods_category_id')->textInput();
+echo $form->field($model,'goods_category_id')->hiddenInput();
 
 //=====================Ztree插件================
 echo "<div><ul id=\"treeDemo\" class=\"ztree\"></ul></div>";

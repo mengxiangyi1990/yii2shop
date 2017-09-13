@@ -81,7 +81,7 @@ EOF
 $del_url = \yii\helpers\Url::to(['goods/delgallery']);
 $this->registerJs(new \yii\web\JsExpression(
     <<<JS
-        $('.del-btn').click(function(){
+        $('table').on('click','.del-btn',function(){
             var tr = $(this).closest('tr');
             var id = tr.attr('data-id');
             if(confirm('确定删除吗')){
@@ -95,6 +95,8 @@ $this->registerJs(new \yii\web\JsExpression(
                 });
             }
         });
+        
+    
 JS
 
 ));
