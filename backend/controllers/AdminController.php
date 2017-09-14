@@ -107,6 +107,25 @@ class AdminController extends \yii\web\Controller
         return $this->redirect(['admin/login']);
     }
 
+    //重置密码
+    public function actionResetpassword($id){
+        $model = Admin::findOne(['id'=>$id]);
+        $request = \Yii::$app->request;
+        if($request->isPost){
+            $model->load($request->post());
+            if($model->validate()){
+                $model->password = $model->n_password;
+                $model->save();
+                \Yii::$app->session->setFlash('success','密码修改成功!');
+                return $this->redirect(['admin/index']);
+            }
+        }
+
+
+        return $this->render('reset',['model'=>$model]);
+    }
+
+
     //自定义验证码
     public function actions()
     {

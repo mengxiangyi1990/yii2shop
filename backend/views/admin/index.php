@@ -23,14 +23,16 @@ echo \yii\helpers\Html::a('添加用户',['admin/add'],['class'=>'btn btn-info']
         <td><?=$model->status?'启用':'禁用'?></td>
         <td>
             <a href="<?=\yii\helpers\Url::to(['admin/edit','id'=>$model->id])?>" class="btn btn-warning">编辑</a>
-            <a href="javascript:;" class="btn btn-danger del-btn">删除</a>
+            <a href="javascript:;" class="btn btn-danger del-btn text">删除</a>
         </td>
     </tr>
     <?php endforeach;?>
 </table>
 <?php
+
 //显示分页工具条
 echo \yii\helpers\Html::a('注销',['admin/logout'],['class'=>'btn btn-info']);
+echo \yii\helpers\Html::a('修改密码',['admin/resetpassword','id'=>$_SESSION['__id']],['class'=>'btn btn-warning']);
 echo \yii\widgets\LinkPager::widget([
     'pagination'=>$pageTool,
     'nextPageLabel'=>'下一页',
