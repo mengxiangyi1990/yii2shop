@@ -26,10 +26,8 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
      * @inheritdoc
      */
     public $password;
-    //常亮定义场景
+    //常量定义场景
     const SCENARIO_ADD = 'add';
-   // const SCENARIO_EDIT = 'edit';
-
 
 
     public static function tableName()
@@ -70,10 +68,10 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             ['username','required','message'=>'用户名不能为空'],
             ['password','required','on'=>self::SCENARIO_ADD,'message'=>'密码不能为空'], //指定规则在添加用户的场景下才起作用
-            ['password','string'],  //修改密码时的场景
+            ['password','string'],
             ['status','required'],
-            ['username','unique','message'=>'该用户名已经存在'],
-            ['email','unique','message'=>'该邮箱已经存在'],
+            ['username','unique','on'=>self::SCENARIO_ADD,'message'=>'该用户名已经存在'],
+            ['email','unique','on'=>self::SCENARIO_ADD,'message'=>'该邮箱已经存在'],
             ['email','required','message'=>'邮箱不能为空'],
             [['email'],'match','pattern'=>'/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/','message'=>'只允许英文字母、数字、下划线、英文句号、以及中划线组成']
         ];

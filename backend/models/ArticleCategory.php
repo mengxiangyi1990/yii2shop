@@ -30,7 +30,9 @@ class ArticleCategory extends \yii\db\ActiveRecord{
     public function rules()
     {
         return [
-            [['name','sort','status'], 'required'],
+            [['name'], 'required','message'=>'名称不能为空'],
+            [['sort'], 'required','message'=>'排序必须填写'],
+            [['status'], 'required'],
             [['intro'], 'required','message'=>'简介内容必须填写!'],
         ];
     }

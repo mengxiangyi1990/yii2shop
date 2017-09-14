@@ -12,6 +12,7 @@ use flyok666\uploadifive\UploadAction;
 use flyok666\qiniu\Qiniu;
 use yii\data\Pagination;
 use yii\db\Query;
+use yii\web\NotFoundHttpException;
 
 
 class GoodsController extends \yii\web\Controller
@@ -21,31 +22,6 @@ class GoodsController extends \yii\web\Controller
         /**
          * 准备分页数据
          */
-
-//        $name = isset($_GET['name'])?$_GET['name']:'';
-//        $sn = isset($_GET['sn'])?$_GET['sn']:'';
-//        $minPrice = isset($_GET['minPrice'])?$_GET['minPrice']:"";
-//        $maxPrice = isset($_GET['maxPrice'])?$_GET['maxPrice']:"";
-
-//        $totalCount = Goods::find()->filterWhere(
-//            ['like','name',$name]
-//        )->orFilterWhere(
-//            ['like','sn',$sn]
-//        )->andFilterWhere(
-//            ['between','shop_price',$minPrice,$maxPrice]
-//        )->count();  //查询brand表中数据总条数
-//        $pageTool = new Pagination([
-//            'totalCount'=>$totalCount,
-//            'defaultPageSize'=>4
-//        ]); //实例化一个分页组件对象
-//
-//        $model = Goods::find()->filterWhere(
-//            ['like','name',$name]
-//            )->orFilterWhere(
-//                ['like','sn',$sn]
-//        )->andFilterWhere(
-//            ['between','shop_price',$minPrice,$maxPrice]
-//        )->limit($pageTool->limit)->offset($pageTool->offset)->orderBy('id desc')->all();
         $name = \Yii::$app->request->get('name');
         $sn = \Yii::$app->request->get('sn');
         $minPrice = \Yii::$app->request->get('minPrice');
@@ -85,7 +61,7 @@ class GoodsController extends \yii\web\Controller
             if(empty($goods_category) && $goodsCategoryId != 0){$model->load($request->post());//将提交数据绑定到$model上
                 $model->load($request->post());//将提交数据绑定到$model上
             }else{
-                exit('只能在相应的分类下添加商品!');
+                throw new NotFoundHttpException('只能在相应的分类下添加商品!');
             }
 
             if($model->validate()){ //验证通过后执行
@@ -130,7 +106,7 @@ class GoodsController extends \yii\web\Controller
             if(empty($goods_category) && $goodsCategoryId != 0){$model->load($request->post());//将提交数据绑定到$model上
                 $model->load($request->post());//将提交数据绑定到$model上
             }else{
-                exit('只能在相应的分类下添加商品!');
+                throw new NotFoundHttpException('只能在相应的分类下添加商品!');
             }
 
             if($model->validate()){ //验证通过后执行

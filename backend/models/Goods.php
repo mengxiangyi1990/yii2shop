@@ -44,7 +44,7 @@ class Goods extends \yii\db\ActiveRecord
             [['name', 'sn'], 'string', 'max' => 20],
             [['logo'], 'string', 'max' => 255],
             ['content','string'],
-
+            [['name'],'required','message'=>'商品名称必须填写'],
         ];
     }
 

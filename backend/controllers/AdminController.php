@@ -31,6 +31,7 @@ class AdminController extends \yii\web\Controller
     public function actionAdd(){
         $model = new Admin();
         $model->scenario = Admin::SCENARIO_ADD;   //方法和场景没有直接关系, 需要自己指定场景
+
         $request = \Yii::$app->request;
         if($request->isPost){
             $model->load($request->post());
@@ -58,10 +59,14 @@ class AdminController extends \yii\web\Controller
                 $model->addError('username','用户名不允许更改');
             }else{
                 $model->load($request->post());
-                if($model->validate()){
-                    $model->save();
-                    \Yii::$app->session->setFlash('success','修改成功!');
-                    return $this->redirect(['admin/index']);
+                if($id != \Yii::$app->user->identity->id){
+                    throw new NotFoundHttpException('当前用户只允许更改自己的密码!');  //抛出异常
+                }else{
+                    if($model->validate()){
+                        $model->save();
+                        \Yii::$app->session->setFlash('success','修改成功!');
+                        return $this->redirect(['admin/index']);
+                    }
                 }
             }
         }
