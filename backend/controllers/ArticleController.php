@@ -40,8 +40,8 @@ class ArticleController extends \yii\web\Controller
                 $model->save(false); //保存数据到article表中
                 $article_content->article_id = $model->id; //将content表中article_id 和article表中数据关联起来
                 $article_content->save();   //保存content表
-               echo  \Yii::$app->session->setFlash('success','添加成功');
-               return $this->redirect(['article/index']);
+                \Yii::$app->session->setFlash('success','添加成功');
+                return $this->redirect(['article/index']);
             }
         }
         $model->status = 1;
@@ -76,7 +76,7 @@ class ArticleController extends \yii\web\Controller
                     $model->create_time = strtotime($model->create_time); //转为时间戳格式
                     $model->save();
                     $article_content->save();
-                    echo \Yii::$app->session->setFlash('success','修改成功');
+                    \Yii::$app->session->setFlash('success','修改成功');
                     return $this->redirect(['article/index']);
             }
         }

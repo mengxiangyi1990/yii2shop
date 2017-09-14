@@ -20,8 +20,8 @@ echo \yii\helpers\Html::a('添加商品分类',['goods-category/add'],['class'=>
             ?></td>
         <td><?=$model->intro?></td>
         <td>
-            <a href="<?= \yii\helpers\Url::to(['goods-category/edit','id'=>$model->id])?>" class="btn btn-default glyphicon glyphicon-pencil" style="width: 55px;">编辑</a>
-            <a href="javascript:;" class="btn btn-danger del-btn"><span class="glyphicon glyphicon-trash "style="width: 30px;" >删除</span></a>
+            <a href="<?= \yii\helpers\Url::to(['goods-category/edit','id'=>$model->id])?>" class="btn btn-default glyphicon glyphicon-pencil" >编辑</a>
+            <a href="javascript:;" class="btn btn-danger del-btn"><span class="glyphicon glyphicon-trash " >删除</span></a>
         </td>
     </tr>
     <?php endforeach;?>
@@ -65,9 +65,10 @@ $this->registerJs(new \yii\web\JsExpression(
             }
         });
         
-        
-        
-        
+     var timer = window.setTimeout(function() {
+        $('#w2-success-0').hide('slow');  
+     },2000)
+               
 
 JS
 

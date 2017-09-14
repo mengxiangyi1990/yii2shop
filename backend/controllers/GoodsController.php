@@ -64,7 +64,6 @@ class GoodsController extends \yii\web\Controller
             $query = $query->andWhere(['<=','shop_price',$maxPrice]);
         }
         $totalCount = $query->count();  //查询brand表中数据总条数
-//        echo $totalCount;exit;
         $pageTool = new Pagination([
             'totalCount'=>$totalCount,
             'defaultPageSize'=>4

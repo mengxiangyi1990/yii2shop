@@ -33,7 +33,7 @@ class GoodsCategoryController extends \yii\web\Controller
                 }else{
                     $model->makeRoot();   //顶级分类 parent_id = 0;
                 }
-                echo \Yii::$app->session->setFlash('success','添加成功!');
+                \Yii::$app->session->setFlash('success','添加成功!');
                 $this->redirect(['goods-category/index']);
             }
         }
@@ -56,12 +56,14 @@ class GoodsCategoryController extends \yii\web\Controller
                      * 如果修改的分类原来就是顶级分类 ,就不需要修改
                      */
                     if($model->getOldAttribute('parent_id') == 0){
+                        \Yii::$app->session->setFlash('success','修改成功!');
                         $model->save();   //不改变层级
                     }else{
+                        \Yii::$app->session->setFlash('success','修改成功!');
                         $model->makeRoot();   //顶级分类 parent_id = 0;
                     }
                 }
-                echo \Yii::$app->session->setFlash('success','添加成功!');
+                \Yii::$app->session->setFlash('success','添加成功!');
                 $this->redirect(['goods-category/index']);
             }
         }

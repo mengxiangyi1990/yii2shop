@@ -66,6 +66,10 @@ $this->registerJs(new \yii\web\JsExpression(
            });
        }    
     });    
-        
+    var timer = window.setTimeout(function() {
+        $('#w2-success-0').hide('slow');  
+    },2000)
+
+
 JS
 ));
