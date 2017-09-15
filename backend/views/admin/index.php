@@ -31,8 +31,8 @@ echo \yii\helpers\Html::a('添加用户',['admin/add'],['class'=>'btn btn-info']
 <?php
 
 //显示分页工具条
-echo \yii\helpers\Html::a('注销',['admin/logout'],['class'=>'btn btn-info']);
-echo \yii\helpers\Html::a('修改密码',['admin/resetpassword','id'=>$_SESSION['__id']],['class'=>'btn btn-warning']);
+echo \yii\helpers\Html::a('注销',['admin/logout','type'=>'normal'],['class'=>'btn btn-info']);
+echo \yii\helpers\Html::a('修改密码',['admin/resetpassword'],['class'=>'btn btn-warning']);
 echo \yii\widgets\LinkPager::widget([
     'pagination'=>$pageTool,
     'nextPageLabel'=>'下一页',

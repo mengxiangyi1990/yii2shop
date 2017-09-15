@@ -26,8 +26,6 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
      * @inheritdoc
      */
     public $password;
-    public $c_password;
-    public $n_password;
     //常量定义场景
     const SCENARIO_ADD = 'add';
 
@@ -72,8 +70,6 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             ['password','required','on'=>self::SCENARIO_ADD,'message'=>'密码不能为空'], //指定规则在添加用户的场景下才起作用
             ['password','string'],
             ['status','required'],
-            ['n_password','required','message'=>'新密码不能为空'],
-            ['c_password', 'compare', 'compareAttribute'=>'n_password','message'=>'两次密码不一致'],
             ['username','unique','on'=>self::SCENARIO_ADD,'message'=>'该用户名已经存在'],
             ['email','unique','on'=>self::SCENARIO_ADD,'message'=>'该邮箱已经存在'],
             ['email','required','message'=>'邮箱不能为空'],
@@ -92,9 +88,6 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             'password' => '密码',
             'email' => 'Email',
             'status' => '状态',
-            'n_password'=>'新密码',
-            'c_password'=>'确认密码',
-            'o_password'=>'旧密码',
         ];
     }
 

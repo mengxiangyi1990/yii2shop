@@ -20,3 +20,17 @@ echo \yii\helpers\Html::submitButton('提交',['class'=>'btn btn-info']);
 
 
 \yii\bootstrap\ActiveForm::end();
+
+/**
+ * @var $this \yii\web\View
+ */
+$del_url = \yii\helpers\Url::to(['brand/del']);
+$this->registerJs(new \yii\web\JsExpression(
+    <<<JS
+    var timer = window.setTimeout(function() {
+        $('#w3-success-0').hide('slow');  
+    },2000)
+
+
+JS
+));

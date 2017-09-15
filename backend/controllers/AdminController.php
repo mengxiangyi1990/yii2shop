@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\Admin;
+use backend\models\PasswordForm;
 use common\models\LoginForm;
 use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
@@ -28,51 +29,62 @@ class AdminController extends \yii\web\Controller
     }
 
     //添加用户
-    public function actionAdd(){
-        $model = new Admin();
-        $model->scenario = Admin::SCENARIO_ADD;   //方法和场景没有直接关系, 需要自己指定场景
+    public function actionAdd()
+    {
+        if (\Yii::$app->user->isGuest) {
+            \Yii::$app->session->setFlash('success', '未登录账号,请重新登录');
+            return $this->redirect(['admin/login']);
+        } else {
+            $model = new Admin();
+            $model->scenario = Admin::SCENARIO_ADD;   //方法和场景没有直接关系, 需要自己指定场景
 
-        $request = \Yii::$app->request;
-        if($request->isPost){
-            $model->load($request->post());
-            if($model->validate()){
+            $request = \Yii::$app->request;
+            if ($request->isPost) {
+                $model->load($request->post());
+                if ($model->validate()) {
                     $model->save();
-                    \Yii::$app->session->setFlash('success','添加成功!');
+                    \Yii::$app->session->setFlash('success', '添加成功!');
                     return $this->redirect(['admin/index']);
+                }
             }
+            $model->status = 1;
+            return $this->render('add', ['model' => $model]);
         }
-        $model->status = 1;
-        return $this->render('add',['model'=>$model]);
     }
 
     //修改用户
     //添加用户
-    public function actionEdit($id){
-        $model = Admin::findOne(['id'=>$id]);
-        //拦截错误
-        if(empty($model)){
-            throw new NotFoundHttpException('用户不存在!');  //抛出异常
-        }
-        $request = \Yii::$app->request;
-        if($request->isPost){
-            if($request->post('Admin')['username'] != $model->username){
-                $model->addError('username','用户名不允许更改');
-            }else{
-                $model->load($request->post());
-                if($id != \Yii::$app->user->identity->id){
-                    throw new NotFoundHttpException('当前用户只允许更改自己的密码!');  //抛出异常
-                }else{
-                    if($model->validate()){
-                        $model->save();
-                        \Yii::$app->session->setFlash('success','修改成功!');
-                        return $this->redirect(['admin/index']);
+    public function actionEdit($id)
+    {
+        if (\Yii::$app->user->isGuest) {
+            \Yii::$app->session->setFlash('success', '未登录账号,请重新登录');
+            return $this->redirect(['admin/login']);
+        } else {
+            $model = Admin::findOne(['id' => $id]);
+            //拦截错误
+            if (empty($model)) {
+                throw new NotFoundHttpException('用户不存在!');  //抛出异常
+            }
+            $request = \Yii::$app->request;
+            if ($request->isPost) {
+                if ($request->post('Admin')['username'] != $model->username) {
+                    $model->addError('username', '用户名不允许更改');
+                } else {
+                    $model->load($request->post());
+                    if ($id != \Yii::$app->user->identity->id) {
+                        throw new NotFoundHttpException('当前用户只允许更改自己的密码!');  //抛出异常
+                    } else {
+                        if ($model->validate()) {
+                            $model->save();
+                            \Yii::$app->session->setFlash('success', '修改成功!');
+                            return $this->redirect(['admin/index']);
+                        }
                     }
                 }
             }
+            return $this->render('add', ['model' => $model]);
         }
-        return $this->render('add',['model'=>$model]);
     }
-
     public function actionDel(){
         $id = \Yii::$app->request->post('id');
         $user = Admin::findOne(['id'=>$id]);
@@ -104,25 +116,36 @@ class AdminController extends \yii\web\Controller
     //用户注销
     public function actionLogout(){
         \Yii::$app->user->logout(); //调用user组件的logout方法
+        $request = \Yii::$app->request;
+        if($request->get('type')){
+            \Yii::$app->session->setFlash('success','退出成功!');
+        }else{
+            \Yii::$app->session->setFlash('success','密码被修改,请重新登录!如非本人更改,请联系管理员!');
+        }
         return $this->redirect(['admin/login']);
     }
 
     //重置密码
-    public function actionResetpassword($id){
-        $model = Admin::findOne(['id'=>$id]);
-        $request = \Yii::$app->request;
-        if($request->isPost){
-            $model->load($request->post());
-            if($model->validate()){
-                $model->password = $model->n_password;
-                $model->save();
-                \Yii::$app->session->setFlash('success','密码修改成功!');
-                return $this->redirect(['admin/index']);
+    public function actionResetpassword()
+    {
+        if (\Yii::$app->user->isGuest) {
+            \Yii::$app->session->setFlash('success', '未登录账号,请重新登录');
+            return $this->redirect(['admin/login']);
+        } else {
+            $model = new PasswordForm();
+            $request = \Yii::$app->request;
+            if($request->isPost){
+                $model->load($request->post());
+                if($model->validate()){
+                    $admin = \Yii::$app->user->identity;
+                    $admin->password = $model->n_password;
+                    $admin->save();
+                    \Yii::$app->session->setFlash('success','密码被修改,请重新登录!如非本人更改,请联系管理员!');
+                    return $this->redirect(['admin/logout']);
+                }
             }
+            return $this->render('reset', ['model' => $model]);
         }
-
-
-        return $this->render('reset',['model'=>$model]);
     }
 
 
