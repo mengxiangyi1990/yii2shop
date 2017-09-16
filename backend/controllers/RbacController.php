@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\PermissionForm;
+use backend\models\RoleForm;
 use yii\web\NotFoundHttpException;
 
 class RbacController extends \yii\web\Controller
@@ -66,7 +67,7 @@ class RbacController extends \yii\web\Controller
                     //实例化权限组件
                     $auth = \Yii::$app->authManager;
                     //创建权限
-                    $permission = \Yii::$app->authManager->getPermission($model->name);
+                    $permission = $old_permission;
                     $permission->description = $model->description;
                     //保存到数据表
                     $auth->update($name,$permission);
@@ -93,7 +94,7 @@ class RbacController extends \yii\web\Controller
         }
 
         $model->name = $name;
-        $model->description = \Yii::$app->request->get('description');
+        $model->description = $request->get('description');
         return $this->render('permission',['model'=>$model]);
     }
 
@@ -111,5 +112,162 @@ class RbacController extends \yii\web\Controller
             return 'fail';
         }
     }
+
+    /**
+     * 添加角色的功能
+     */
+    public function actionAddRole(){
+        $model = new RoleForm();
+        $model->scenario = RoleForm::SCENARIO_ADD;
+        $request = \Yii::$app->request;
+        if($request->isPost){
+            $model->load($request->post());
+            if($model->validate()){ //验证通过
+                $auth = \Yii::$app->authManager;
+                $role = $auth->createRole($model->name);//创建角色
+                $role->description = $model->description;
+                $auth->add($role); //保存角色
+                //如果选择了权限,给用户分配权限
+                $permissions = $model->permissions;
+                if($permissions){
+                    foreach ($permissions as $permissionName){  //checkbox传递的数据是数组需要遍历
+                        $permission = $auth->getPermission($permissionName); //需要获取到权限对象而不是字符串
+                        $auth->addChild($role,$permission); //给用户分配权限
+                    }
+                }
+                //跳转到列表页
+                \Yii::$app->session->setFlash('success','角色添加成功');
+                return $this->redirect(['role-index']);
+            }
+        }
+        return $this->render('role-add',['model'=>$model]);
+    }
+
+    //角色列表页
+    public function actionRoleIndex(){
+        //实例化权限组件
+        $auth = \Yii::$app->authManager;
+        //获取所有角色
+        $role = $auth->getRoles();
+        //分配数据到视图页
+        return $this->render('roles-index',['roles'=>$role]);
+    }
+    //修改角色
+    public function actionRoleEdit($name){
+        $model = new RoleForm();
+        $request = \Yii::$app->request;
+        if($request->isPost){
+            $model->load($request->post());
+            if($model->validate()){
+                //获取原角色
+                $o_role = \Yii::$app->authManager->getRole($name);
+                if(empty($o_role)){
+                    throw new NotFoundHttpException('未找到该角色名称!');
+                }else{
+                    if($model->name == $name){ //如果角色名称未修改的情况下
+                        $auth = \Yii::$app->authManager;
+                        $role = $o_role;
+                        $role->description = $model->description;
+                        $auth->update($name,$role);
+                        //如果选择了权限,给用户分配权限
+                        $permissions = $model->permissions;
+                        if($permissions){
+                            //判断原用户权限是否和当前修改的权限相同 如果相同的情况下不做任何修改 如果不相同的情况下,才修改
+                            //获取原用户权限
+                            $o_permissions = $auth->getPermissionsByRole($name);
+                            $permissionOname = [];
+                            foreach ($o_permissions as $key => $o_permission){
+                                $permissionOname[]=$key;
+                            }
+                            /**
+                             * 合并数组并去除重复的部分  然后就不能判断名字是否相同了
+                             */
+                            $samePermissions = array_intersect($permissionOname,$permissions);
+                            foreach ($permissions as $permissionName){
+                                if(!in_array($permissionName,$samePermissions)){ //判断是否已经拥有该权限
+                                    $permission = $auth->getPermission($permissionName); //需要获取到权限对象而不是字符串
+                                    $auth->addChild($role,$permission); //给用户分配权限
+                                }
+                            }
+                        }
+                        \Yii::$app->session->setFlash('success','修改成功');
+                        return $this->redirect('role-index');
+                    }else{
+                        if(\Yii::$app->authManager->getRole($model->name)){
+                            $model->addError('name','已经存在的角色,不能修改为相同的角色名字');
+                        }else{
+                            //实例化权限组件
+                            $auth = \Yii::$app->authManager;
+                            //获取原角色
+                            $role = $auth->getRole($model->name);
+                            //修改原数据
+                            $role->name = $model->name;
+                            $role->description = $model->description;
+                            $auth->update($name,$role);
+
+                            //如果选择了权限,给用户分配权限
+                            $permissions = $model->permissions;
+                            if($permissions){
+                                //判断原用户权限是否和当前修改的权限相同 如果相同的情况下不做任何修改 如果不相同的情况下,才修改
+                                //获取原用户权限
+                                $o_permissions = $auth->getPermissionsByRole($name);
+                                $permissionOname = [];
+                                foreach ($o_permissions as $key => $o_permission){
+                                    $permissionOname[]=$key;
+                                }
+                                /**
+                                 * 合并数组并去除重复的部分  然后就不能判断名字是否相同了
+                                 */
+                                $samePermissions = array_intersect($permissionOname,$permissions);
+                                foreach ($permissions as $permissionName){
+                                    if(!in_array($permissionName,$samePermissions)){ //判断是否已经拥有该权限
+                                        $permission = $auth->getPermission($permissionName); //需要获取到权限对象而不是字符串
+                                        $auth->addChild($role,$permission); //给用户分配权限
+                                    }
+                                }
+                            }
+                            \Yii::$app->session->setFlash('success','修改成功');
+                            return $this->redirect('role-index');
+                        }
+                    }
+                }
+            }
+        }
+        //数据回显
+        $model->name = $name;
+        $model->description = $request->get('description');
+        $permissions = \Yii::$app->authManager->getPermissionsByRole($name);
+        $model->permissions = array_keys($permissions);
+        return $this->render('role-add',['model'=>$model]);
+    }
+
+    //删除角色
+    public function actionRoleDel(){
+
+        $name = \Yii::$app->request->post('name');
+        $role = \Yii::$app->authManager->getRole($name);  //获取当前角色数据
+        $permissions = \Yii::$app->authManager->getPermissions($name); //获取角色权限数据
+        if($role){
+            \Yii::$app->authManager->remove($role);
+            if($permissions){  //判断是否存在权限
+                foreach ($permissions as $permissionName){
+                    \Yii::$app->authManager->removeChild($role,$permissionName);
+                }
+            }
+            return 'success';
+        }else{
+            return 'fail';
+        }
+
+
+    }
+
+
+
+
+
+
+
+
 
 }
