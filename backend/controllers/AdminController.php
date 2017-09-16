@@ -43,6 +43,14 @@ class AdminController extends \yii\web\Controller
                 $model->load($request->post());
                 if ($model->validate()) {
                     $model->save();
+                    //给用户分配角色
+                    $auth = \Yii::$app->authManager;
+                    if($model->rolesName != null){
+                        foreach ($model->rolesName as $role_name){
+                            $role_name = $auth->getRole($role_name);
+                            $auth->assign($role_name,$model->getId());
+                        }
+                    }
                     \Yii::$app->session->setFlash('success', '添加成功!');
                     return $this->redirect(['admin/index']);
                 }
@@ -76,10 +84,30 @@ class AdminController extends \yii\web\Controller
                     } else {
                         if ($model->validate()) {
                             $model->save();
+                            $auth = \Yii::$app->authManager;
+                            //首先判断用户是否选择了角色
+                            if(empty($model->rolesName)){  //如果没有选择角色的话  就清空所有角色
+                                $auth->revokeAll($id);
+                            }else{
+                                $auth->revokeAll($id);
+                                foreach ($model->rolesName as $rolename){
+                                    $role_name = $auth->getRole($rolename);
+                                    $auth->assign($role_name,$model->getId());
+                                }
+                            }
                             \Yii::$app->session->setFlash('success', '修改成功!');
                             return $this->redirect(['admin/index']);
                         }
                     }
+                }
+            }
+            //将用户拥有的角色查询出来回显到修改页面
+            $auth = \Yii::$app->authManager;
+            $roles = $auth->getRolesByUser($id); //通过getRolesByUser()方法查找出用户的所有角色
+            if($roles != null){
+                $model->rolesName = [];
+                foreach ($roles as $role){
+                    $model->rolesName[] = $role->name;
                 }
             }
             return $this->render('add', ['model' => $model]);
@@ -89,7 +117,12 @@ class AdminController extends \yii\web\Controller
         $id = \Yii::$app->request->post('id');
         $user = Admin::findOne(['id'=>$id]);
         if($user){
-            $user->delete();
+            //$user->delete();
+            $auth = \Yii::$app->authManager; //实例化authManager组件
+            if($auth->getRolesByUser($id)){
+                    $auth->revokeAll($id);
+            }
+
             return 'success';
         }else{
             return 'fail';

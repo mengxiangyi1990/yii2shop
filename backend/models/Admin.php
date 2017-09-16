@@ -26,6 +26,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
      * @inheritdoc
      */
     public $password;
+    public $rolesName;
     //常量定义场景
     const SCENARIO_ADD = 'add';
 
@@ -69,6 +70,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             ['username','required','message'=>'用户名不能为空'],
             ['password','required','on'=>self::SCENARIO_ADD,'message'=>'密码不能为空'], //指定规则在添加用户的场景下才起作用
             ['password','string'],
+            ['rolesName','safe'],
             ['status','required'],
             ['username','unique','on'=>self::SCENARIO_ADD,'message'=>'该用户名已经存在'],
             ['email','unique','on'=>self::SCENARIO_ADD,'message'=>'该邮箱已经存在'],
@@ -88,6 +90,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             'password' => '密码',
             'email' => 'Email',
             'status' => '状态',
+            'rolesName' => '角色',
         ];
     }
 
@@ -155,5 +158,17 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     public function validateAuthKey($authKey)
     {
         return $authKey == $this->auth_key;
+    }
+
+    /**
+     * 静态方法返回权限表的所有数据
+     */
+    public static function getRoles(){
+        $roles = \Yii::$app->authManager->getRoles() ;
+        $items = [];
+        foreach ($roles as $role){
+            $items[$role->description] = $role->description;
+        }
+        return $items;
     }
 }

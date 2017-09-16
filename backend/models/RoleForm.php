@@ -22,7 +22,7 @@ class RoleForm extends Model{
 
     public function validateName(){
         if(\Yii::$app->authManager->getRole($this->name)){
-            $this->addError('name','角色名称已经存在');
+            $this->addError('name','角色名称已经存在!');
         }
     }
 

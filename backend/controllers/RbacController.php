@@ -171,68 +171,26 @@ class RbacController extends \yii\web\Controller
                         $auth->update($name,$role);
                         //如果选择了权限,给用户分配权限
                         $permissions = $model->permissions;
-                        if($permissions){
-                            //判断原用户权限是否和当前修改的权限相同 如果相同的情况下不做任何修改 如果不相同的情况下,才修改
-                            //获取原用户权限
-                            $o_permissions = $auth->getPermissionsByRole($name);
-                            $permissionOname = [];
-                            foreach ($o_permissions as $key => $o_permission){
-                                $permissionOname[]=$key;
+                        if(empty($permissions)){ //如果为空就清除角色的所有权限
+                            foreach ($auth->getPermissionsByRole($name) as $permissionName){
+                                $auth->removeChild($auth->getRole($name),$permissionName);
                             }
-                            /**
-                             * 合并数组并去除重复的部分  然后就不能判断名字是否相同了
-                             */
-                            $samePermissions = array_intersect($permissionOname,$permissions);
-                            foreach ($permissions as $permissionName){
-                                if(!in_array($permissionName,$samePermissions)){ //判断是否已经拥有该权限
-                                    $permission = $auth->getPermission($permissionName); //需要获取到权限对象而不是字符串
-                                    $auth->addChild($role,$permission); //给用户分配权限
-                                }
+                        }else{ //如果不为空,先清除所有权限,再给角色添加权限
+                            foreach ($auth->getPermissionsByRole($name) as $permissionName){
+                                $auth->removeChild($auth->getRole($name),$permissionName);
+                            }
+                            foreach ($permissions as $permissionName){  //checkbox传递的数据是数组需要遍历
+                                $permission = $auth->getPermission($permissionName); //需要获取到权限对象而不是字符串
+                                $auth->addChild($role,$permission); //给用户分配权限
                             }
                         }
                         \Yii::$app->session->setFlash('success','修改成功');
                         return $this->redirect('role-index');
-                    }else{
-                        if(\Yii::$app->authManager->getRole($model->name)){
-                            $model->addError('name','已经存在的角色,不能修改为相同的角色名字');
-                        }else{
-                            //实例化权限组件
-                            $auth = \Yii::$app->authManager;
-                            //获取原角色
-                            $role = $auth->getRole($model->name);
-                            //修改原数据
-                            $role->name = $model->name;
-                            $role->description = $model->description;
-                            $auth->update($name,$role);
-
-                            //如果选择了权限,给用户分配权限
-                            $permissions = $model->permissions;
-                            if($permissions){
-                                //判断原用户权限是否和当前修改的权限相同 如果相同的情况下不做任何修改 如果不相同的情况下,才修改
-                                //获取原用户权限
-                                $o_permissions = $auth->getPermissionsByRole($name);
-                                $permissionOname = [];
-                                foreach ($o_permissions as $key => $o_permission){
-                                    $permissionOname[]=$key;
-                                }
-                                /**
-                                 * 合并数组并去除重复的部分  然后就不能判断名字是否相同了
-                                 */
-                                $samePermissions = array_intersect($permissionOname,$permissions);
-                                foreach ($permissions as $permissionName){
-                                    if(!in_array($permissionName,$samePermissions)){ //判断是否已经拥有该权限
-                                        $permission = $auth->getPermission($permissionName); //需要获取到权限对象而不是字符串
-                                        $auth->addChild($role,$permission); //给用户分配权限
-                                    }
-                                }
-                            }
-                            \Yii::$app->session->setFlash('success','修改成功');
-                            return $this->redirect('role-index');
-                        }
                     }
                 }
             }
         }
+
         //数据回显
         $model->name = $name;
         $model->description = $request->get('description');
@@ -258,16 +216,5 @@ class RbacController extends \yii\web\Controller
         }else{
             return 'fail';
         }
-
-
     }
-
-
-
-
-
-
-
-
-
 }
