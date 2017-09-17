@@ -1,36 +1,51 @@
 <?php
 
-echo \yii\helpers\Html::a('添加权限',['rbac/permission-add'],['class'=>'btn btn-info'])
+echo \yii\helpers\Html::a('添加权限',['rbac/permission-add'],['class'=>'btn btn-info']);
+
 
 ?>
 
 <h3>用户权限列表</h3>
-<table class="table table-bordered">
-    <tr>
-        <th>权限名称</th>
-        <th>描述</th>
-        <th>操作</th>
-    </tr>
-    <?php foreach ($permissions as $permission):?>
-    <tr data-name="<?=$permission->name?>">
-        <td><?=$permission->name?></td>
-        <td><?=$permission->description?></td>
-        <td>
-            <a href="<?=\yii\helpers\Url::to(['rbac/permission-edit','name'=>$permission->name,'description'=>$permission->description])?>" class="btn btn-warning">修改</a>
-            <a href="javascript:;" class="btn btn-danger del-btn">删除</a>
-        </td>
-    </tr>
-    <?php endforeach;?>
-</table>
+
+
+    <table id="table_id_example" class="table table-bordered display">
+        <thead>
+        <tr>
+            <th>权限名称</th>
+            <th>描述</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($permissions as $permission):?>
+            <tr data-name="<?=$permission->name?>">
+                <td><?=$permission->name?></td>
+                <td><?=$permission->description?></td>
+                <td>
+                    <a href="<?=\yii\helpers\Url::to(['rbac/permission-edit','name'=>$permission->name,'description'=>$permission->description])?>" class="btn btn-warning">修改</a>
+                    <a href="javascript:;" class="btn btn-danger del-btn">删除</a>
+                </td>
+            </tr>
+        <?php endforeach;?>
+
+        </tbody>
+    </table>
+
 <?php
 
 /**
  * @var $this \yii\web\View
  */
+$this->registerCssFile('/http://cdn.datatables.net/1.10.15/css/jquery.dataTables.css');
+$this->registerJsFile('http://cdn.datatables.net/1.10.15/js/jquery.dataTables.js',['depends'=>\yii\web\JqueryAsset::className()]);
 
 $del_url = \yii\helpers\Url::to(['rbac/permission-del']);
 $this->registerJs(new \yii\web\JsExpression(
     <<<JS
+        $(document).ready( function () {
+     $('#table_id_example').DataTable();
+    } );
+    
     $('.del-btn').click(function(){
        if(confirm('确定删除吗？')){
            var tr = $(this).closest('tr');

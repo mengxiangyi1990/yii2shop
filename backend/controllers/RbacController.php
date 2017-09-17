@@ -72,7 +72,7 @@ class RbacController extends \yii\web\Controller
                     //保存到数据表
                     $auth->update($name,$permission);
                     //提示信息
-                    \Yii::$app->session->setFlash('success','无任何修改');
+                    \Yii::$app->session->setFlash('success','修改成功');
                     return $this->redirect(['permission-index']);
                 }else{
                     if(\Yii::$app->authManager->getPermission($model->name)){
