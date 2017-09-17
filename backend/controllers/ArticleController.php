@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\Rbacfilters;
 use backend\models\Article;
 use backend\models\ArticleCategory;
 use backend\models\ArticleDetail;
@@ -94,6 +95,17 @@ class ArticleController extends \yii\web\Controller
         }
         //跳转到列表页
         return 'fail';
+    }
+
+    //过滤的行为
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>Rbacfilters::className(),
+                'except'=>['logout','login','captcha','error'],
+            ]
+        ];
     }
 
 }

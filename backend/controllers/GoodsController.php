@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\Rbacfilters;
 use backend\models\Brand;
 use backend\models\Goods;
 use backend\models\GoodsCategory;
@@ -228,5 +229,16 @@ class GoodsController extends \yii\web\Controller
         }
         //跳转到列表页
         return 'fail';
+    }
+
+    //过滤的行为
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>Rbacfilters::className(),
+                'except'=>['logout','login','captcha','error'],
+            ]
+        ];
     }
 }

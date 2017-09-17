@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\Rbacfilters;
 use backend\models\ArticleCategory;
 use yii\data\Pagination;
 
@@ -72,5 +73,14 @@ class ArticleCategoryController extends \yii\web\Controller
         //跳转到列表页
         return 'fail';
     }
-
+    //过滤的行为
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>Rbacfilters::className(),
+                'except'=>['logout','login','captcha','error'],
+            ]
+        ];
+    }
 }

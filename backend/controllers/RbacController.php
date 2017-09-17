@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\Rbacfilters;
 use backend\models\PermissionForm;
 use backend\models\RoleForm;
 use yii\web\NotFoundHttpException;
@@ -217,4 +218,18 @@ class RbacController extends \yii\web\Controller
             return 'fail';
         }
     }
+
+    //过滤的行为
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>Rbacfilters::className(),
+                'except'=>['logout','login','captcha','error'],
+            ]
+        ];
+    }
+
+
+
 }

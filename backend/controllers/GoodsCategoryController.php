@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\Rbacfilters;
 use backend\models\GoodsCategory;
 use yii\data\Pagination;
 
@@ -81,4 +82,14 @@ class GoodsCategoryController extends \yii\web\Controller
         }
     }
 
+    //过滤的行为
+    public function behaviors()
+    {
+        return [
+            'rbac'=>[
+                'class'=>Rbacfilters::className(),
+                'except'=>['logout','login','captcha','error'],
+            ]
+        ];
+    }
 }

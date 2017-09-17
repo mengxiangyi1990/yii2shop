@@ -1,33 +1,33 @@
 <?php
 /* @var $this yii\web\View */
-echo \yii\helpers\Html::a('修改密码',['admin/resetpassword'],['class'=>'btn btn-warning']);
+
+echo \yii\helpers\Html::a('添加菜单',['menu/add-menu'],['class'=>'btn btn-info']);
+
+
 ?>
-
-<h3>用户列表 </h3>
-
-<table class="table table-bordered text-center">
+<h2>菜单列表</h2>
+<table class="table ">
     <tr>
-        <td>ID</td>
-        <td>用户名</td>
-        <td>邮箱</td>
-        <td>状态</td>
-        <td>操作</td>
+        <th>名称</th>
+        <th>路由</th>
+        <th>排序</th>
+        <th>操作</th>
     </tr>
     <?php foreach ($models as $model):?>
     <tr data-id="<?=$model->id?>">
-        <td><?=$model->id?></td>
-        <td><?=$model->username?></td>
-        <td><?=$model->email?></td>
-        <td><?=$model->status?'启用':'禁用'?></td>
+        <td><?=$model->name?></td>
+        <td><?=$model->url?></td>
+        <td><?=$model->sort?></td>
         <td>
-            <a href="<?=\yii\helpers\Url::to(['admin/edit','id'=>$model->id])?>" class="btn btn-warning">编辑</a>
-            <a href="javascript:;" class="btn btn-danger del-btn text">删除</a>
+            <a href="<?=\yii\helpers\Url::to(['menu/edit','id'=>$model->id])?>" class="btn btn-default">编辑</a>
+            <a href="javascript:;" class="btn btn-danger del-btn">删除</a>
         </td>
     </tr>
     <?php endforeach;?>
 </table>
+
 <?php
-//显示分页工具条
+//输出分页工具条
 echo \yii\widgets\LinkPager::widget([
     'pagination'=>$pageTool,
     'nextPageLabel'=>'下一页',
@@ -35,7 +35,7 @@ echo \yii\widgets\LinkPager::widget([
     'maxButtonCount'=>3
 ]);
 
-$del_url = \yii\helpers\Url::to(['admin/del']);
+$del_url = \yii\helpers\Url::to(['menu/del']);
 $this->registerJs(new \yii\web\JsExpression(
     <<<JS
     $('.del-btn').click(function(){
@@ -51,11 +51,18 @@ $this->registerJs(new \yii\web\JsExpression(
                 }
            });
        }
+    })
+    
+    $('.btn-reverse').click(function(){
+        $('input').val('');
+        $('.btn-search').click();
     });
     var timer = window.setTimeout(function() {
-        $('#w4-success-0').hide('slow');  
+        $('#w2-success-0').hide('slow');  
     },2000)
+
 
 JS
 ));
+
 
