@@ -53,7 +53,7 @@ class GoodsController extends \yii\web\Controller
     //商品添加
     public function actionAdd(){
         $model = new Goods();
-        $brand = Brand::find()->all();  //查询出brand表中所有数据
+        $brand = Brand::find()->where(['>','status','-1'])->all();  //查询出brand表中所有数据
         $request = \Yii::$app->request;
         if($request->isPost){ //如果是post提交方式
             //通过post中goods_category_id查找goods_category表中的对应的id, 再查找所有parent_id = id 的数据, 如果有,就不能绑定数据,并且parent_id != 0
@@ -73,7 +73,7 @@ class GoodsController extends \yii\web\Controller
                 $goods_day_count = GoodsDayCount::find()->where(['day'=>date('Y-m-d',$model->create_time)])->one(); //实例化GoodsDayCount模型对象
                 if(empty($goods_day_count)){  //如果商品数量表中没有对应的日期 就新添加一条记录 数量为1
                     $goods_day_count = new GoodsDayCount();
-                    $goods_day_count->day = date('Y-m-d',$model->create_time);
+                    $goods_day_count->day = date('Ymd',$model->create_time);
                     $goods_day_count->count = 1;
                     $model->sn = $goods_day_count->day.'00001';
                 }else{
@@ -93,7 +93,6 @@ class GoodsController extends \yii\web\Controller
     }
 
     //商品修改
-    //商品添加
     public function actionEdit($id){
         $model = Goods::find()->where(['id'=>$id])->one();
         $goodsInfo = GoodsInfo::find()->where(['goods_id'=>$id])->one();

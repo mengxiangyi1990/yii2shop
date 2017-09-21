@@ -1,9 +1,6 @@
 <?php
 /* @var $this yii\web\View */
 
-echo \yii\helpers\Html::a('添加菜单',['menu/add-menu'],['class'=>'btn btn-info']);
-
-
 ?>
 <h2>菜单列表</h2>
 <table class="table ">

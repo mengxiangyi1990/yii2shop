@@ -98,9 +98,6 @@ $this->registerJs(new \yii\web\JsExpression(
         $('input').val('');
         $('.btn-search').click();
     });
-    var timer = window.setTimeout(function() {
-        $('#w2-success-0').hide('slow');  
-    },2000)
 
 
 JS

@@ -1,11 +1,8 @@
 <?php
 
-echo \yii\helpers\Html::a('添加权限',['rbac/permission-add'],['class'=>'btn btn-info']);
-
-
 ?>
 
-<h3>用户权限列表</h3>
+<h2>用户权限列表</h2>
 
 
     <table id="table_id_example" class="table table-bordered display">

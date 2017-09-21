@@ -65,7 +65,7 @@ class BrandController extends \yii\web\Controller
         $totalCount = Brand::find()->where(['>','status','-1'])->count();  //查询brand表中数据总条数
         $pageTool = new Pagination([
             'totalCount'=>$totalCount,
-            'defaultPageSize'=>2
+            'defaultPageSize'=>4
         ]); //实例化一个分页组件对象
         //查询分页后的总数据
         $model = Brand::find()->where(['>','status','-1'])->limit($pageTool->limit)->offset($pageTool->offset)->orderBy('id desc')->all();

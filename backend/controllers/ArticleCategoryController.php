@@ -15,7 +15,7 @@ class ArticleCategoryController extends \yii\web\Controller
         $totalCount = ArticleCategory::find()->where(['>','status','-1'])->count();  //查询brand表中数据总条数
         $pageTool = new Pagination([
             'totalCount'=>$totalCount,
-            'defaultPageSize'=>2
+            'defaultPageSize'=>4
         ]); //实例化一个分页组件对象
         //查询分页后的总数据
         $model = ArticleCategory::find()->where(['>','status','-1'])->limit($pageTool->limit)->offset($pageTool->offset)->orderBy('id desc')->all();
@@ -30,15 +30,11 @@ class ArticleCategoryController extends \yii\web\Controller
         if($request->isPost){ //如果是POST提交方式
             $model->load($request->post()); //绑定数据
             if($model->validate()){  // 如果验证成功
-
                 $model->save(); //保存数据到数据表
                 //显示提示信息
                 \Yii::$app->session->setFlash('success','添加成功');
                 //跳转到列表页
                 return $this->redirect(['article-category/index']);
-
-            }else{
-                var_dump($model->getErrors());exit; //显示错误信息
             }
         }
         $model->status = 1; //默认状态为显示

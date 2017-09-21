@@ -70,4 +70,19 @@ class Goods extends \yii\db\ActiveRecord
             'view_times' => '浏览次数',
         ];
     }
+
+    //查询商品相册
+    public function getGallery(){
+        return  $this->hasMany(GoodsGallery::className(),['goods_id'=>'id']);
+    }
+    //链表查询商品分类
+    public function getBrand(){
+        return $this->hasOne(Brand::className(),['id'=>'brand_id']);
+    }
+    //查询商品内容
+    public function getInfo(){
+        return $this->hasOne(GoodsInfo::className(),['goods_id'=>'id']);
+    }
+
+
 }

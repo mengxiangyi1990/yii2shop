@@ -1,9 +1,8 @@
 <?php
 
-echo \yii\helpers\Html::a('添加类别',['article-category/add'],['class'=>'btn btn-primary']);
 
 ?>
-
+<h2>文章分类列表</h2>
     <table class="table text-center">
         <tr>
             <td>ID</td>

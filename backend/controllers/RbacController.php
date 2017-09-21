@@ -40,7 +40,7 @@ class RbacController extends \yii\web\Controller
 
     //权限列表
     public function actionPermissionIndex(){
-        //实例化权限组件
+        //实例化authManager组件
         $auth = \Yii::$app->authManager;
         //获取所有的权限
         $permissions = $auth->getPermissions();

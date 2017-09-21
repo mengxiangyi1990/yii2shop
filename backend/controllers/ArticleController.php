@@ -21,7 +21,7 @@ class ArticleController extends \yii\web\Controller
         //实例化 分页组件对象
         $pageTool = new Pagination([
             'totalCount'=>$totalCount,
-            'defaultPageSize'=>2
+            'defaultPageSize'=>4
         ]);
         $model = Article::find()->where(['>','status','-1'])->limit($pageTool->limit)->offset($pageTool->offset)->orderBy('id desc')->all();
 

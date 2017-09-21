@@ -1,10 +1,8 @@
 <?php
 
-echo \yii\helpers\Html::a('添加角色',['rbac/add-role'],['class'=>'btn btn-info'])
-
 ?>
 
-<h3>角色列表</h3>
+<h2>角色列表</h2>
 <table class="table table-bordered">
     <tr>
         <th>角色名称</th>

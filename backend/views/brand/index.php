@@ -1,8 +1,8 @@
 <?php
 
-echo \yii\helpers\Html::a('添加类别',['brand/add'],['class'=>'btn btn-primary']);
-
 ?>
+
+<h2>品牌列表</h2>
 
 <table class="table text-center">
     <tr>

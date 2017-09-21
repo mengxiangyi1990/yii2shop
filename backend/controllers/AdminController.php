@@ -150,12 +150,8 @@ class AdminController extends \yii\web\Controller
     //用户注销
     public function actionLogout(){
         \Yii::$app->user->logout(); //调用user组件的logout方法
-        $request = \Yii::$app->request;
-       // if($request->get('type')){
-            \Yii::$app->session->setFlash('success','退出成功!');
-       // }else{
-            //\Yii::$app->session->setFlash('success','密码被修改,请重新登录!如非本人更改,请联系管理员!');
-       // }
+
+        \Yii::$app->session->setFlash('success','退出成功!');
         return $this->redirect(['admin/login']);
     }
 
