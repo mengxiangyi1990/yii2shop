@@ -42,6 +42,7 @@ $(function(){
 		});
 
 		$("#total").text(total.toFixed(2));
+        changeCart($(this).closest('tr').attr('data-id'),amount.val());
 	});
 
 	//直接输入
@@ -62,9 +63,32 @@ $(function(){
 		$("#total").text(total.toFixed(2));
 
 	});
+
+
+	$('tbody').on('click','.del-btn',function () {
+		var tr = $(this).closest('tr');
+		var id = tr.attr('data-id');
+        if(confirm('确定删除吗？')){
+            var tr = $(this).closest('tr');
+            var id = tr.attr('data-id');
+            var url = "del.html";
+            $.post(url,{id:id},function(data) {
+                if(data == 'success'){
+                    alert('删除成功');
+                    tr.hide('slow');
+                }else{
+                    alert('删除失败');
+                }
+            });
+        }
+
+    });
+
+
 });
 
 var changeCart = function(goods_id,amount){
-	alert('111');
     $.post("/member/ajax.html",{goods_id:goods_id,amount:amount},function(){});
 };
+
+

@@ -79,13 +79,13 @@
                     <a href="javascript:;" class="add_num"></a>
                 </td>
                 <td class="col5">￥<span><?=($carts[$model->id])*($model->shop_price).".00"?></span></td>
-                <td class="col6"><a href="">删除</a></td>
+                <td class="col6"><a href="javascript:;" class="del-btn">删除</a></td>
             </tr>
         <?php $totalPrice += ($carts[$model->id])*($model->shop_price) ;endforeach;?>
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="6">购物金额总计： <strong>￥ <span id="total"><?=$totalPrice.".00"?></span></strong></td>
+            <td colspan="6">购物金额总计： <strong>￥ <span id="total"><?=$totalPrice?></span></strong></td>
         </tr>
         </tfoot>
     </table>
