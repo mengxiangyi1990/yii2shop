@@ -57,4 +57,11 @@ $(function(){
 		$(".company_input").attr("disabled","disabled");
 	});
 
+	//点击提交按钮提交数据
+	// $("#sub").click(function () {
+	// 	console.debug(111);
+	// 	alert(111);
+    // });
+
+
 });

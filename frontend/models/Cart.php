@@ -2,6 +2,7 @@
 
 namespace frontend\models;
 
+use backend\models\Goods;
 use Yii;
 
 /**
@@ -44,4 +45,10 @@ class Cart extends \yii\db\ActiveRecord
             'member_id' => '用户id',
         ];
     }
+    //查询goods表中数据
+    public function getGoods(){
+        return $this->hasOne(Goods::className(),['id'=>'goods_id']);
+    }
+
+
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace backend\models;
+use frontend\models\Cart;
 use Yii;
 use creocoder\nestedsets\NestedSetsBehavior;
 use yii\helpers\ArrayHelper;
