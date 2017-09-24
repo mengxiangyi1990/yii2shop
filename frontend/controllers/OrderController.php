@@ -15,30 +15,32 @@ class OrderController extends \yii\web\Controller
     public $enableCsrfValidation = false;
     //订单信息表单
     public function actionIndex(){
-
         //判断用户是否登录
         if(\Yii::$app->user->isGuest){
             \Yii::$app->session->setFlash('success','请登录后结算');
             return $this->redirect(['member/login']);
         }else{
-
             $id = \Yii::$app->user->id;
             $Carts = Cart::find()->where(['member_id'=>$id])->all();
-
             //实例化order模型
             $model = new Order();
             $request = \Yii::$app->request;
             $address = Address::find()->all();
-
             if($request->isPost){
-                $model->delivery_id = $request->post('delivery_id');
+
+               $delivery_id = $request->post('delivery_id');
+                if($delivery_id == ""){
+                    $delivery_id = 1;
+                }
+                $model->delivery_id = $delivery_id;
                 $model->delivery_name = Order::$deliveries[$model->delivery_id][0];
                 $model->delivery_price = Order::$deliveries[$model->delivery_id][1];
-                //var_dump($request->post('goods_ids'));exit;
-                $address_id = $request->post('address_id');
                 //通过address_id 查找地址表中数据
+                $address_id = $request->post('address_id');
+                if($address_id == ""){
+                    $address_id = 1;
+                }
                 $address_in_db = Address::findOne(['id'=>$address_id,'member_id'=>\Yii::$app->user->id]);
-
                 $model->member_id = \Yii::$app->user->id;
                 $model->name = $address_in_db->name;
                 $model->province = $address_in_db->province;
@@ -48,7 +50,6 @@ class OrderController extends \yii\web\Controller
                 $model->tel = $address_in_db->tel;
                 $model->status = 1; //+++++++还没做
                 $model->create_time = time();
-
                 $model->total = 0;//遍历购物车表里面的商品,累加计算,加上运费
                 $goods_id = $request->post('goods_ids');
                 foreach ($goods_id as $value){  //遍历查询所有goods_id
@@ -59,7 +60,6 @@ class OrderController extends \yii\web\Controller
                 $model->total += $model->delivery_price; //保存order表中total数据
                 // 操作mysql之前开启事物
                 $transaction = \Yii::$app->db->beginTransaction();//开始事务
-
                 try{
                     //保存order表数据
                     $model->save();
@@ -83,6 +83,10 @@ class OrderController extends \yii\web\Controller
                         if($order_goods->save()){
                            $cart->delete();
                         }
+                        //实例化goods模型
+                        $goods = Goods::findOne(['goods_id'=>$cart->goods_id]);
+                        $goods->stock  -= $cart->amount;
+                        $goods->save();
                     }
                    //不需要跳转, 直接视图跳转,成功都显示一个页面
                 }catch (Exception $e){
@@ -90,16 +94,17 @@ class OrderController extends \yii\web\Controller
                     $transaction->rollBack();
                 }
             }
-
             return $this->renderPartial('index',['models'=>$model,'address'=>$address,'carts'=>$Carts]);
         }
-
     }
 
     //订单提交成功页面
     public function actionSuccess(){
-
         return $this->renderPartial('success');
+    }
+
+    //订单列表页
+    public function actionMyOrder(){
 
     }
 

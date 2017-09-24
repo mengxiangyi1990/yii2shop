@@ -64,13 +64,13 @@
         <div class="address">
             <h3>收货人信息</h3>
             <div class="address_info">
+                <?php foreach ($address as $key=>$val):?>
                 <p>
-                    <?php foreach ($address as $key=>$val):?>
                     <input type="hidden" name="address_id" class="address_id" value=""/>
-                    <input type="radio" value="<?=$val->id?>" name="address_id" class="a-id"/><?=$val->name."&emsp;","联系电话&nbsp;".$val->tel,"&emsp;".$val->province,$val->city,$val->area?></p>
-                    <?php endforeach; ?>
+                    <input type="radio" value="<?=$val->id?>" name="address_id" class="a-id" <?= $key == 0 ? "checked" : "" ?>/><?=$val->name."&emsp;",$val->province,$val->city,$val->area."&emsp;","联系电话&nbsp;".$val->tel?>
+                </p>
+                <?php endforeach; ?>
             </div>
-
 
         </div>
         <!-- 收货人信息  end-->
@@ -94,7 +94,7 @@
                     <tr class="cur">
                         <td>
                             <input type="hidden" name="delivery" class="delivery-val" value=""/>
-                            <input type="radio" name="delivery" checked="checked" class="delivery-id" value="<?=$key?>" /><?=$val[0]?>
+                            <input type="radio" name="delivery" <?= $key == 1 ? "checked" : ""?> class="delivery-id" value="<?=$key?>" delivery-price="<?=$val[1]?>"/><?=$val[0]?>
                         </td>
                         <td><?=$val[1]?></td>
                         <td><?=$val[2]?></td>
@@ -125,33 +125,6 @@
             </div>
         </div>
         <!-- 支付方式  end-->
-
-        <!-- 发票信息 start-->
-<!--        <div class="receipt none">-->
-<!--            <h3>发票信息 </h3>-->
-<!---->
-<!--            <div class="receipt_select ">-->
-<!--                <form action="" method="post">-->
-<!--                    <ul>-->
-<!--                        <li>-->
-<!--                            <label for="">发票抬头：</label>-->
-<!--                            <input type="radio" name="type" checked="checked" class="personal" />个人-->
-<!--                            <input type="radio" name="type" class="company"/>单位-->
-<!--                            <input type="text" class="txt company_input" disabled="disabled" />-->
-<!--                        </li>-->
-<!--                        <li>-->
-<!--                            <label for="">发票内容：</label>-->
-<!--                            <input type="radio" name="content" checked="checked" />明细-->
-<!--                            <input type="radio" name="content" />办公用品-->
-<!--                            <input type="radio" name="content" />体育休闲-->
-<!--                            <input type="radio" name="content" />耗材-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </form>-->
-<!---->
-<!--            </div>-->
-<!--        </div>-->
-        <!-- 发票信息 end-->
 
         <!-- 商品清单 start -->
         <div class="goods">
@@ -190,11 +163,11 @@
                             </li>
                             <li>
                                 <span>运费：</span>
-                                <em>￥10.00</em>
+                                <em class="delivery_pc">￥25.00</em>
                             </li>
                             <li>
                                 <span>应付总额：</span>
-                                <em>￥<?=$totalPrice?></em>
+                                <em class="total_price" data-pirce="<?=$totalPrice?>">￥<?=$totalPrice?></em>
                             </li>
                         </ul>
                     </td>
@@ -208,7 +181,7 @@
 
     <div class="fillin_ft">
         <a href="javascript:;" id="sub"><span>提交订单</span></a>
-        <p>应付总额：<strong>￥<?=$totalPrice?>元</strong></p>
+        <p>应付总额：<strong class="new_price"><?=$totalPrice?></strong></p>
     </div>
 </div>
 </form>
@@ -243,14 +216,8 @@
 <!-- 底部版权 end -->
 
 <script type="text/javascript">
-//    $("#sub").click(function () {
-//       //获取运送方式
-//        var delivery_id = $("#delivery-id").val();
-//        alert(delivery_id);
-//
-//
-//
-//    });
+
+
 $(function () {
     //获取送货方式id
     $(".delivery-id").click(function(){
@@ -273,8 +240,20 @@ $(function () {
         }
         $.post("index.html",{delivery_id:delivery_id,address_id:add_id,goods_ids:goods_id_list},function(){});
 
-        check();
+//        check();
     });
+    //实时更新运费价格
+    $(".delivery-id").click(function () {
+        var delivery_price = $(this).attr("delivery-price");
+        $(".delivery_pc").text("￥"+delivery_price);
+        var o_price = $(".total_price").attr("data-pirce");
+        var new_price = parseInt(delivery_price)+parseInt(o_price);
+        $(".new_price").text("￥"+new_price);
+        $(".total_price").text("￥"+new_price);
+    });
+
+
+
 });
     function check (){
         window.location.href = "http://www.yii2shop.com/order/success.html";
