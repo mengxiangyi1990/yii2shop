@@ -240,7 +240,7 @@ $(function () {
         }
         $.post("index.html",{delivery_id:delivery_id,address_id:add_id,goods_ids:goods_id_list},function(){});
 
-//        check();
+        check();
     });
     //实时更新运费价格
     $(".delivery-id").click(function () {

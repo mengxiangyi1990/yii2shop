@@ -95,12 +95,9 @@ class Order extends \yii\db\ActiveRecord
         ];
     }
 
-//    public function getGoods(){
-//        $id = Yii::$app->user->id;
-//        var_dump(Goods::find()->where(['member_id'=>$id])->all());
-//        return $this->hasMany(Goods::className(),['goods_id'=>'id']);
-//
-//    }
+    public function getGoods_logo(){
+        return $this->hasMany(OrderGoods::className(),['order_id'=>'id']);
+    }
 
 
 

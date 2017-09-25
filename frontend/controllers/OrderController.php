@@ -100,12 +100,17 @@ class OrderController extends \yii\web\Controller
 
     //订单提交成功页面
     public function actionSuccess(){
+
+
+
         return $this->renderPartial('success');
     }
 
     //订单列表页
-    public function actionMyOrder(){
+    public function actionMy_order(){
+        $models = Order::findAll(['member_id'=>\Yii::$app->user->id]);
 
+        return $this->renderPartial('order',['models'=>$models]);
     }
 
 
