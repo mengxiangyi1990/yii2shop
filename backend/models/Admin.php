@@ -4,6 +4,7 @@ namespace backend\models;
 
 use backend\filters\Rbacfilters;
 use Yii;
+use yii\rbac\Permission;
 use yii\web\IdentityInterface;
 
 /**
@@ -177,19 +178,23 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         //获取所有一级菜单
         $menuItems = [];
         $menus = Menu::find()->where(['parent_id'=>0])->orderBy('id desc')->all();
-        foreach ($menus as $menu){
+        foreach ($menus as $menu) {
+
                 //获取所有一级菜单的子菜单
-                $children = Menu::find()->where(['parent_id'=>$menu->id])->all();
+                $children = Menu::find()->where(['parent_id' => $menu->id])->all();
                 $items = [];
-                foreach ($children as $child){
+                foreach ($children as $child) {
                     //判断当前用户是否有该路由的权限,只显示有权限的菜单
-                    if(Yii::$app->user->can($child->url)){
-                        $items[] = ['label' =>$child->name, 'url' => [$child->url]];
+                    if (Yii::$app->user->can($child->url)) {
+                        $items[] = ['label' => $child->name, 'url' => [$child->url]];
                     }
                 }
-                $menuItems[] = ['label' => $menu->name, 'items' => $items];
+                if($items != null){
+                    $menuItems[] = ['label' => $menu->name, 'items' => $items];
+                }
+
             }
-        return $menuItems;
+            return $menuItems;
     }
 
 
