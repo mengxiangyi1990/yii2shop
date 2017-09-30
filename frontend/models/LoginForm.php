@@ -18,7 +18,7 @@ class LoginForm extends Model{
             ['username','required','message'=>'用户名不能为空'],
             ['password','required','message'=>'密码不能为空'],
             ['remember','string'],
-            ['checkcode','captcha','captchaAction' => 'member/captcha','message'=>'验证码错误'],
+            //['checkcode','captcha','captchaAction' => 'member/captcha','message'=>'验证码错误'],
         ];
     }
 

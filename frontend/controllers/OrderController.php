@@ -27,7 +27,6 @@ class OrderController extends \yii\web\Controller
             $request = \Yii::$app->request;
             $address = Address::find()->all();
             if($request->isPost){
-
                $delivery_id = $request->post('delivery_id');
                 if($delivery_id == ""){
                     $delivery_id = 1;
@@ -38,8 +37,9 @@ class OrderController extends \yii\web\Controller
                 //通过address_id 查找地址表中数据
                 $address_id = $request->post('address_id');
                 if($address_id == ""){
-                    $address_id = 1;
+                    $address_id = 8;
                 }
+
                 $address_in_db = Address::findOne(['id'=>$address_id,'member_id'=>\Yii::$app->user->id]);
                 $model->member_id = \Yii::$app->user->id;
                 $model->name = $address_in_db->name;
@@ -84,7 +84,7 @@ class OrderController extends \yii\web\Controller
                            $cart->delete();
                         }
                         //实例化goods模型
-                        $goods = Goods::findOne(['goods_id'=>$cart->goods_id]);
+                        $goods = Goods::findOne(['id'=>$cart->goods_id]);
                         $goods->stock  -= $cart->amount;
                         $goods->save();
                     }

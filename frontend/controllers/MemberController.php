@@ -9,6 +9,7 @@ use frontend\models\Cart;
 use frontend\models\LoginForm;
 use frontend\models\Member;
 use frontend\models\SmsDemo;
+use yii\base\ErrorException;
 use yii\data\Pagination;
 use yii\web\Cookie;
 use yii\web\NotFoundHttpException;
@@ -363,10 +364,30 @@ class MemberController extends \yii\web\Controller
 //        }
         $phone = \Yii::$app->request->post('phone');
         $code = rand(1000,9999);
-       // \Yii::$app->session->set('code_'.$phone,$code);
-        $redis = new \Redis();
-        $redis->connect('127.0.0.1');
-        $redis->set('code_'.$phone,$code);
+
+        $time = \Yii::$app->session->get('time_'.$phone);  //上次发送时间
+        //每个手机号每一分钟只能发一条
+        if($time && (time()-$time<60)){
+           echo '两次短信发送间隔时间必须大于1分钟'; exit;
+        }
+        
+        //判断发送时间是否为当天所发
+        if(date('Ymd',$time)<date('Ymd')){
+            \Yii::$app->session->set('count_'.$phone,0);
+        }
+
+        //每天只能发送20条
+        $count = \Yii::$app->session->get('count_'.$phone);
+        if($count && ($count >= 20)){
+            echo '当天发送短信次数已超过20次,请稍后再试';exit;
+        }
+
+        \Yii::$app->session->set('time_'.$phone,time());
+        \Yii::$app->session->set('code_'.$phone,$code);
+        \Yii::$app->session->set('count_'.$phone,++$count);
+//        $redis = new \Redis();
+//        $redis->connect('127.0.0.1');
+//        $redis->set('code_'.$phone,$code);
         echo 'OK';
         echo $code;
 

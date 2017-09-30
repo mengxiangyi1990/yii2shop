@@ -163,7 +163,7 @@ class BrandController extends \yii\web\Controller
         return [
             'rbac'=>[
                 'class'=>Rbacfilters::className(),
-                'except'=>['logout','login','captcha','error'],
+                'except'=>['logout','login','captcha','error','s-upload'],
             ]
         ];
     }

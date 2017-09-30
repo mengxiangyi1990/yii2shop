@@ -28,6 +28,7 @@ class Member extends \yii\db\ActiveRecord implements IdentityInterface
     public $password;
     public $confirm_password;
     const SCENARIO_ADD = "add";
+    const SCENARIO_Api = "api";
 
     /**
      * @inheritdoc
@@ -46,9 +47,12 @@ class Member extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             ['username','required','message'=>'用户名不能为空'],
             ['password','required','on'=>self::SCENARIO_ADD,'message'=>'密码不能为空'], //指定规则在添加用户的场景下才起作用
+            ['password','required','on'=>self::SCENARIO_Api,'message'=>'密码不能为空'], //指定规则在添加用户的场景下才起作用
             ['password','string'],
             ['confirm_password','required','on'=>self::SCENARIO_ADD,'message'=>'确认密码不能为空'],
+            ['confirm_password','required','on'=>self::SCENARIO_Api,'message'=>'确认密码不能为空'],
             ['confirm_password','required','message'=>'确认密码不能为空'],
+            ['confirm_password','required','on'=>self::SCENARIO_Api,'message'=>'确认密码不能为空'],
             ['rolesName','safe'],
             ['tel','match','pattern'=>'/^[0-9]{11,11}$/','message'=>'请正确输入11位电话号码'],
             ['username','unique','on'=>self::SCENARIO_ADD,'message'=>'该用户名已经存在'],

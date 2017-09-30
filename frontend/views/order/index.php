@@ -159,7 +159,7 @@
                             </li>
                             <li>
                                 <span>返现：</span>
-                                <em>-￥240.00</em>
+                                <em>-￥00.00</em>
                             </li>
                             <li>
                                 <span>运费：</span>
@@ -167,7 +167,7 @@
                             </li>
                             <li>
                                 <span>应付总额：</span>
-                                <em class="total_price" data-pirce="<?=$totalPrice?>">￥<?=$totalPrice?></em>
+                                <em class="total_price" data-pirce="<?=$totalPrice?>">￥<?=($totalPrice + 25)?></em>
                             </li>
                         </ul>
                     </td>
@@ -181,7 +181,7 @@
 
     <div class="fillin_ft">
         <a href="javascript:;" id="sub"><span>提交订单</span></a>
-        <p>应付总额：<strong class="new_price"><?=$totalPrice?></strong></p>
+        <p>应付总额：<strong class="new_price"><?=($totalPrice + 25)?></strong></p>
     </div>
 </div>
 </form>

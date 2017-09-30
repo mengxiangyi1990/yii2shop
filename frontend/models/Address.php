@@ -18,6 +18,10 @@ use Yii;
  */
 class Address extends \yii\db\ActiveRecord
 {
+    //public $id = '';
+    const SCENARIO_ADD= 'add';
+
+
     /**
      * @inheritdoc
      */
@@ -34,9 +38,17 @@ class Address extends \yii\db\ActiveRecord
         return [
             [['tel'], 'integer'],
             [['status'], 'string'],
+            [['member_id'], 'integer'],
             //['sms','validateSms','message'=>'手机验证码错误'],
             [['name', 'address'], 'string', 'max' => 255],
+            [['name', 'address'], 'string', 'max' => 255],
             [['province', 'city', 'area'], 'string', 'max' => 20],
+            ['name', 'required', 'on'=>self::SCENARIO_ADD,'message'=>'名字 必须添写'],
+            ['address', 'required', 'on'=>self::SCENARIO_ADD,'message'=>'详细地址 必须添写'],
+            ['tel', 'required', 'on'=>self::SCENARIO_ADD,'message'=>'联系电话 必须添写'],
+            ['province', 'required', 'on'=>self::SCENARIO_ADD,'message'=>'省份 必须添写'],
+            [ 'city',  'required', 'on'=>self::SCENARIO_ADD,'message'=>'市级 必须添写'],
+            ['area',  'required', 'on'=>self::SCENARIO_ADD,'message'=>'县/乡 必须添写'],
         ];
     }
 
