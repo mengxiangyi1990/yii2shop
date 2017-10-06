@@ -119,10 +119,7 @@ class MemberController extends \yii\web\Controller
     //前台首页
     public function actionIndex()
     {
-
-        $categories1 = GoodsCategory::find()->where(['parent_id'=>0])->all();
-
-        return $this->renderPartial('index',['categories1'=>$categories1]);
+        return $this->renderPartial('index');
     }
 
     //商品列表页
@@ -131,19 +128,9 @@ class MemberController extends \yii\web\Controller
         $query = Goods::find();
         //三种情况  1级分类 2级分类 3级分类
         if($category->depth == 2){//3级分类
-            //sql: select * from goods where goods_category_id = $category_id
             $query->andWhere(['goods_category_id'=>$category_id]);
         }else{
-            //1级分类 2级分类
-            //$category id = 5
-            //3级分类ID  7 8
-            //SQL select *  from goods where goods_category_id  in (7,8)
-            /* $ids = [];//  [7,8]
-             foreach ($category->children()->andWhere(['depth'=>2])->all() as $category3){
-                 $ids[]=$category3->id;
-             }*/
             $ids = $category->children()->select('id')->andWhere(['depth'=>2])->column();
-            //var_dump($ids);exit;
             $query->andWhere(['in','goods_category_id',$ids]);
         }
         $pager = new Pagination();
@@ -155,8 +142,33 @@ class MemberController extends \yii\web\Controller
     //商品详情页
     public function actionGoods($id){
         $model = Goods::findOne(['id'=>$id]);
+        //更新浏览次数
+        //Goods::updateAllCounters(['view_times'=>1],'id='.$model->id);
         return $this->renderPartial('goods',['model'=>$model]);
     }
+    //ajax获取商品浏览次数
+    public function actionViewTimes($id){
+        //使用redis优化查询性能
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $times =  $redis->get('times_'.$id);
+        if($times === false){
+            $goods = Goods::findOne(['id'=>$id]);
+            if($goods){
+               // Goods::updateAllCounters(['view_times'=>1],'id='.$goods->id);
+                $times = $goods->view_times;
+                $redis->set('times_'.$id,$times);
+            }
+        }
+        //定量回写到数据库
+        if($times%100 == 0){
+            Goods::updateAll(['view_times'=>$times],['id'=>$id]);
+        }
+
+        $redis->incr('times_'.$id);
+        return $times;
+    }
+
 
     //添加到购物车页面  完成添加到购物车的操作
     public function actionAddtocart($goods_id,$amount){
@@ -406,5 +418,17 @@ class MemberController extends \yii\web\Controller
     return 'true';
     }
 
+    //ajax获取用户登录信息
+    public function actionUserInfo(){
+        $user = \Yii::$app->user->identity;
+        if($user){
+            $isLogin = true;
+            $name = $user->username;
+        }else{
+            $isLogin = false;
+            $name = '';
+        }
+        return json_encode(['isLogin'=>$isLogin,'name'=>$name]);
+    }
 
 }

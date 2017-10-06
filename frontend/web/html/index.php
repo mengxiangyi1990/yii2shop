@@ -23,7 +23,7 @@
         </div>
         <div class="topnav_right fr">
             <ul>
-                <li id="user-info">您好，欢迎来到京西！[<a href="login.html">登录</a>] [<a href="register.html">免费注册</a>] </li>
+                <li>您好，欢迎来到京西！[<a href="login.html">登录</a>] [<a href="register.html">免费注册</a>] </li>
                 <li class="line">|</li>
                 <li>我的订单</li>
                 <li class="line">|</li>
@@ -136,8 +136,7 @@
             </div>
 
             <div class="cat_bd">
-                    <?=\backend\models\GoodsCategory::getGoodsCategories()?>
-            </div>
+                    <div class="cat item1"><h3><a href="/member/list.html?category_id=1">家用电器</a><b></b></h3><div class="cat_detail"><dl class="dl_1st"><dt><a href="/member/list.html?category_id=2">大家电</a></dt><dd><a href="/member/list.html?category_id=10">HDR电视</a><a href="/member/list.html?category_id=7">超薄电视</a></dd></dl></div></div><div class="cat "><h3><a href="/member/list.html?category_id=3">电脑</a><b></b></h3><div class="cat_detail"><dl class="dl_1st"><dt><a href="/member/list.html?category_id=14">电脑整机</a></dt><dd><a href="/member/list.html?category_id=16">游戏本</a><a href="/member/list.html?category_id=15">笔记本</a></dd></dl></div></div>            </div>
 
         </div>
         <!--  商品分类部分 end-->
@@ -707,17 +706,6 @@
     </p>
 </div>
 <!-- 底部版权 end -->
-<script>
-    //ajax获取用户登录状态
-    $.getJSON("<?=\yii\helpers\Url::to(['member/user-info'])?>",function (json) {
-        if(json.isLogin){
-            $('#user-info').html("欢迎"+json.name+"<a href=\"<?=\yii\helpers\Url::to(['member/logout'])?>\"> 注销</a>");
-        }
-    });
-
-</script>
-
-
 
 </body>
 </html>

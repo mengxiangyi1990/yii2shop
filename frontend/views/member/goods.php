@@ -590,7 +590,7 @@
                     <li class="market_price"><span>定价：</span><em>￥<?=$model->market_price?></em></li>
                     <li class="shop_price"><span>本店价：</span> <strong>￥<?=$model->shop_price?></strong> <a href="">(降价通知)</a></li>
                     <li><span>上架时间：</span><?=date('Y-m-d',$model->create_time)?></li>
-                    <li class="star"><span>商品评分：</span> <strong></strong><a href="">(已有<?=$model->view_times?>人查看)</a></li> <!-- 此处的星级切换css即可 默认为5星 star4 表示4星 star3 表示3星 star2表示2星 star1表示1星 -->
+                    <li class="star"><span>商品人气：</span> <span id="view_times">0</span><strong></strong></li> <!-- 此处的星级切换css即可 默认为5星 star4 表示4星 star3 表示3星 star2表示2星 star1表示1星 -->
                 </ul>
                 <form action="<?=\yii\helpers\Url::to(['member/addtocart'])?>" method="get" class="choose">
                     <ul>
@@ -996,6 +996,13 @@
 
 <script type="text/javascript">
     document.execCommand("BackgroundImageCache", false, true);
+
+    $.get("/member/view-times.html?id=<?=$model->id?>",function(data){
+        $("#view_times").text(data);
+    });
+
+
+
 </script>
 </body>
 </html>

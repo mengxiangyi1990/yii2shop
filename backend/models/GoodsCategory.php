@@ -87,4 +87,37 @@ class GoodsCategory extends \yii\db\ActiveRecord
     {
         return new CategoryQuery(get_called_class());
     }
+
+
+    //获取首页商品分类
+    public static function getGoodsCategories(){
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $html = $redis->get('goods_categories');
+        if($html === false){
+            $html = '';
+            $categories1 = self::find()->where(['parent_id'=>0])->all();
+            foreach ($categories1 as $i=>$category1){
+                $html .= '<div class="cat '.($i?'':'item1').'">';
+                $html .= '<h3><a href="'.\yii\helpers\Url::to(['member/list','category_id'=>$category1->id]).'">'.$category1->name.'</a><b></b></h3>';
+                $html .= '<div class="cat_detail">';
+                foreach ($category1->children(1)->all() as $k=>$category2){
+                    $html .= '<dl '.($k?'':'class="dl_1st"').'>';
+                    $html .= '<dt><a href="'.\yii\helpers\Url::to(['member/list','category_id'=>$category2->id]).'">'.$category2->name.'</a></dt>';
+                    $html .= '<dd>';
+                    foreach ($category2->children()->all() as $category3){
+                        $html .= '<a href="'.\yii\helpers\Url::to(['member/list','category_id'=>$category3->id]).'">'.$category3->name.'</a>';
+                    }
+                    $html .= '</dd>';
+                    $html .= '</dl>';
+                }
+                $html .= '</div>';
+                $html .= '</div>';
+            }
+            //缓存到redis中
+            $redis->set('goods_categories',$html,24*3600);
+        }
+        return $html;
+    }
+
 }
