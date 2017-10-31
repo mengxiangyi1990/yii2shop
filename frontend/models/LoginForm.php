@@ -11,6 +11,7 @@ class LoginForm extends Model{
     public $checkcode;
     public $remember;
     public $sms;
+   // public $token;
 
     public function rules()
     {
@@ -38,6 +39,8 @@ class LoginForm extends Model{
             if(\Yii::$app->security->validatePassword($this->password,$user->password_hash)){
                 //验证通过 可以通过
                 $user->last_login_time = time();
+                $user->token = md5(time() . uniqid('', true));
+                //$this->token = $user->token;
                 $user->last_login_ip = \Yii::$app->request->getUserIP();
                 $user->save(false);
                 //判断用户是否选择自动登录功能

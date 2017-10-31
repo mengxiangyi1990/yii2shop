@@ -431,4 +431,6 @@ class MemberController extends \yii\web\Controller
         return json_encode(['isLogin'=>$isLogin,'name'=>$name]);
     }
 
+
+
 }
