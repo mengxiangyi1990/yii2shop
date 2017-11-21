@@ -13,7 +13,6 @@ class ArticleController extends \yii\web\Controller
 {
     //文章列表页
     public function actionIndex(){
-
         /**
          * 准备分页数据
          */
