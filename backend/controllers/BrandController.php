@@ -55,8 +55,6 @@ class BrandController extends \yii\web\Controller
         return $this->render('add',['model'=>$model]);
     }
 
-
-
     //状态列表
     public function actionIndex(){
         /**
@@ -85,8 +83,6 @@ class BrandController extends \yii\web\Controller
         //跳转到列表页
         return 'fail';
     }
-
-
     public function actions() {
         return [
             's-upload' => [

@@ -6,6 +6,7 @@ use backend\models\ArticleCategory;
 use backend\models\Brand;
 use backend\models\Goods;
 use backend\models\GoodsCategory;
+use Codeception\Module\Redis;
 use frontend\models\Address;
 use frontend\models\Cart;
 use frontend\models\LoginForm;
@@ -16,6 +17,7 @@ use yii\db\Exception;
 use yii\web\Controller;
 use yii\web\Cookie;
 use yii\web\Response;
+use yii\web\Session;
 
 class ApiController extends Controller{
     public $enableCsrfValidation = false;
@@ -24,6 +26,253 @@ class ApiController extends Controller{
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
         parent::init();
+    }
+    //获取TokenAPI
+    public function actionToken()
+    {
+        //获取用户传入数据
+        $post = \Yii::$app->request->post();
+        $token = md5(time() .$post['appId'] .uniqid('', true));
+        $request = [
+            'status'=>true,
+            'code'=>0000,
+            'msg'=>'',
+            'token'=>$token
+        ];
+        //验证参数
+        if(empty($post['appId']) || empty($post['sign']) || empty($post['timestamp'])){
+            $request['status'] = false;
+            $request['code'] = 4004;
+            $request['msg'] = '未知异常';
+            $request['token'] = '';
+            return $request;
+        }
+        //验证请求是否过期
+        if($post['timestamp'] - time() > 3600*2){
+            $request['status'] = false;
+            $request['code'] = 4005;
+            $request['msg'] = '请求超期';
+            $request['token'] = '';
+            return $request;
+        }
+        //验证用户appID
+        if($post['appId'] != 'app001'){
+            $request['status'] = false;
+            $request['code'] = 4002;
+            $request['msg'] = 'appId 无效';
+            $request['token'] = '';
+            return $request;
+        }
+        //验证签名
+        $sign = $post['sign'];
+        if($post['sign']){
+            unset($post['sign']);
+            //构造源串
+            ksort($post);
+            $str = http_build_query($post);
+            //构造秘钥
+            $key = "26c564db43df8467597eb878fd56e895&";
+            //获取签名
+            $signature = base64_encode(hash_hmac("sha1", $str, $key, true));
+            if($sign != $signature){
+                $request['status'] = false;
+                $request['code'] = 4003;
+                $request['msg'] = '签名不匹配';
+                $request['token'] = '';
+                return $request;
+            }
+        }
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $redis->set('token',$token,3600*2);
+        return $request;
+    }
+    //开具发票API
+    public function actionInvoiceInfo(){
+        $request = [
+            'status'=>true,
+            'code'=>'0000',
+            'msg'=>'开票申请成功',
+        ];
+        //接收传入参数
+        $post = \Yii::$app->request->post();
+        if(empty($post['billNo']) || empty($post['custName']) || empty($post['custTel']) || empty($post['custType']) || empty($post['appId']) || empty($post['accessToken']) || empty($post['sign']) || empty($post['timestamp'])){
+            $request['status'] = false;
+            $request['code'] = 1002;
+            $request['msg'] = '输入信息有误';
+            return $request;
+        }
+        //验证appId
+        if($post['appId'] != 'app001'){
+            $request['status'] = false;
+            $request['code'] = 4002;
+            $request['msg'] = 'appId 无效';
+            return $request;
+        }
+        //判断token是否过期
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $token = $redis->get('token');
+        if(empty($token)){
+            $request['status'] = false;
+            $request['code'] = 4005;
+            $request['msg'] = '请求超期';
+            return $request;
+        }elseif($token != $post['accessToken']){
+            $request['status'] = false;
+            $request['code'] = 4001;
+            $request['msg'] = 'accessToken 无效';
+            return $request;
+        }
+        if($post['timestamp'] - time() > 3600*2){
+            $request['status'] = false;
+            $request['code'] = 4005;
+            $request['msg'] = '请求超期';
+            $request['token'] = '';
+            return $request;
+        }
+        //查找billNo是否存在
+        if($post['billNo'] != 'ua151076154268026399'){
+            $request['status'] = false;
+            $request['code'] = 1001;
+            $request['msg'] = '没有找到对应订单信息，请稍后重试';
+            return $request;
+        }
+        //验证sign
+        $sign = $this->actionCheckSign($post);
+        if($post['sign'] != $sign){
+            $request['status'] = false;
+            $request['code'] = 4003;
+            $request['msg'] = '签名不匹配';
+            return $request;
+        }
+        return $request;
+    }
+    //发票查询API
+    public function actionCheck(){
+        $request = [
+            'status'=>true,
+            'code'=>'0000',
+            'msg'=>'',
+        ];
+        $post = \Yii::$app->request->post();
+        //判断appId
+        if($post['appId'] != 'app001'){
+            $request['status'] = false;
+            $request['code'] = 4002;
+            $request['msg'] = 'appId 无效';
+            return $request;
+        }
+        //判断token是否过期
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $token = $redis->get('token');
+        if(empty($token)){
+            $request['status'] = false;
+            $request['code'] = 4005;
+            $request['msg'] = '请求超期';
+            return $request;
+        }elseif($token != $post['accessToken']){
+            $request['status'] = false;
+            $request['code'] = 4001;
+            $request['msg'] = 'accessToken 无效';
+            return $request;
+        }
+        //验证请求是否过期
+        if($post['timestamp'] - time() > 3600*2){
+            $request['status'] = false;
+            $request['code'] = 4005;
+            $request['msg'] = '请求超期';
+            $request['token'] = '';
+            return $request;
+        }
+        //验证sign
+        $sign = $this->actionCheckSign($post);
+        if($post['sign'] != $sign){
+            $request['status'] = false;
+            $request['code'] = 4003;
+            $request['msg'] = '签名不匹配';
+            return $request;
+        }
+        //判断订单信息
+        if($post['billNo'] != 'ua151076154268026399'){
+            $request['status'] = false;
+            $request['code'] = 1006;
+            $request['msg'] = '没有找到该订单信息';
+            return $request;
+        }else{
+            $request['data'] = [
+                [
+                    'swno' => 'ua151076154268026399',
+                    'FPHM' => '123477768',
+                    'FPDM' => '123477768',
+                    'KPRQ' => '2017-09-16 00:00:00',
+                    'billType' => '1',
+                    'pdfUrl' => 'invoice/20171115/5a0c64a93745c.pdf',
+                ],
+            ];
+        }
+        return $request;
+    }
+
+//
+//    //重置密码
+//    public function actionResetPwd(){
+//        $request = [
+//            'status'=>true,
+//            'code'=>'0000',
+//            'msg'=>'密码已被重置',
+//        ];
+//        $post = \Yii::$app->request->post();
+//        //验证参数是否正确
+//        if(empty($post['appId']) || empty($post['accessToken']) || empty($post['timestamp'] || empty($post['sign']))){
+//            $request['status'] = false;
+//            $request['code'] = 4004;
+//            $request['msg'] = '未知异常';
+//        }
+//        $redis = new \Redis();
+//        $redis->connect('127.0.0.1');
+//        $token = $redis->get('token');
+//        //验证是否超时
+//        if(empty($token)){
+//            $request['status'] = false;
+//            $request['code'] = 4005;
+//            $request['msg'] = '请求超期';
+//            return $request;
+//        }
+//        //验证token是否正确
+//        if($post['accessToken'] != $token){
+//            $request['status'] = false;
+//            $request['code'] = 4001;
+//            $request['msg'] = 'accessToken 无效';
+//        }
+//        //验证sign
+//        $sign = $this->actionCheckSign($post);
+//        if($post['sign'] != $sign){
+//            $request['status'] = false;
+//            $request['code'] = 4003;
+//            $request['msg'] = '签名不匹配';
+//            return $request;
+//        }
+//        //重置用户密码
+//        $upwd = '000000';
+//
+//        //发送邮件
+//        \Yii::$app->mailer->compose()
+//            ->setFrom('18582494674@163.com') //发送邮箱地址
+//            ->setTo('18582494674@163.com') //用户邮箱地址
+//            ->setSubject('提醒密码修改成功')
+//            ->setHtmlBody("尊敬的用户您好,您的密码已经重置,重置后的密码为$upwd,请你收到邮件后尽快修改密码,避免密码被盗给你造成经济损失!")
+//            ->send();
+//       return $request;
+//    }
+    //验证sign
+    public function actionCheckSign($data){
+        unset($data['sign']);
+        ksort($data);
+        $str = http_build_query($data);
+        $sign = base64_encode(hash_hmac("sha1", $str, "26c564db43df8467597eb878fd56e895&", true));
+        return $sign;
     }
 
     //用户注册
@@ -64,7 +313,6 @@ class ApiController extends Controller{
                 if($member->login()){
                     $result['msg'] = '登录成功';
                     $result['data']['token'] = \Yii::$app->user->identity['token']; // 将用户登录信息中的token查出来返回给用户
-
                 }else{
                     $result['msg'] = $member->getErrors();
                 }
@@ -106,9 +354,6 @@ class ApiController extends Controller{
         }
         return $result;
     }
-
-
-
 
     //获取当前登录的用户信息
     public function actionGetUserInfo(){
@@ -273,7 +518,6 @@ class ApiController extends Controller{
                     $ids = $category->children()->select('id')->andWhere(['depth'=>2])->column();
                     $query->andWhere(['in','goods_category_id',$ids]);
                 }
-
                 if($category){
                     $request['error'] = false;
                     $request['data'] = $category;
@@ -759,5 +1003,23 @@ class ApiController extends Controller{
         return $request;
     }
 
-
+    /**
+     * 获取签名
+     * @return string
+     */
+    public function actionGetSign() {
+        //echo time();exit;
+        $data = \Yii::$app->request->post();
+        ksort($data); //排序
+        unset($data['sign']); //删除参数中的sign
+        $str = '';
+        foreach ($data as $key => $val){
+                $str .= ($key.$val);
+        }
+        //hash_hmac1方式加密
+        $sign = hash_hmac("sha1", $str, 'd4t8amh84na0j5lc56bt7edig3yareuo&', false);
+        //base64方式加密
+        $sign = base64_encode($sign);
+        return  $sign;
+    }
 }

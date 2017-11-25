@@ -78,6 +78,22 @@ class MemberController extends \yii\web\Controller
 
         return $this->renderPartial('login');
     }
+    public function actionSign(){
+//        $data = [
+//            'appId'=>'app001',
+//            'appKey'=>'faac6f6a842445bd886c81dbff966d13',
+//            'sign'=>'faac6f6a842445bd886c81dbff966d13',
+//        ];
+        $data = \Yii::$app->request->post();
+        ksort($data);
+        $source = '';
+        foreach ($data as $k => $v) $source .= $k.'='.$v.'&';
+        $source = mb_substr($source, 0, (mb_strlen($source)-1));
+        $source = $source.'';
+        return hash('sha256',$source);
+    }
+
+
     //用户注销
     public function actionLogout(){
         \Yii::$app->user->logout();
@@ -115,6 +131,13 @@ class MemberController extends \yii\web\Controller
 //            }
 //        }
 //    }
+    public function actionTest(){
+        $model = new Member();
+        return $this->render('test',['model'=>$model]);
+    }
+
+
+
 
     //前台首页
     public function actionIndex()
@@ -168,8 +191,6 @@ class MemberController extends \yii\web\Controller
         $redis->incr('times_'.$id);
         return $times;
     }
-
-
     //添加到购物车页面  完成添加到购物车的操作
     public function actionAddtocart($goods_id,$amount){
         if(\Yii::$app->user->isGuest){
@@ -382,7 +403,7 @@ class MemberController extends \yii\web\Controller
         if($time && (time()-$time<60)){
            echo '两次短信发送间隔时间必须大于1分钟'; exit;
         }
-        
+
         //判断发送时间是否为当天所发
         if(date('Ymd',$time)<date('Ymd')){
             \Yii::$app->session->set('count_'.$phone,0);
@@ -430,7 +451,5 @@ class MemberController extends \yii\web\Controller
         }
         return json_encode(['isLogin'=>$isLogin,'name'=>$name]);
     }
-
-
 
 }
